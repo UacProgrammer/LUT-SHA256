@@ -24,7 +24,7 @@
 
 **Documents:**
 - Academic Paper (IEEE format): [paper_LUT-SHA256.pdf](https://zenodo.org/records/22140328)
-- Complete Technical Report (v1.1, Spanish): [`informe_LUT-SHA256.pdf`]([LUT-SHA256_EN.pdf))
+- Complete Technical Report (v1.1, Spanish): [`informe_LUT-SHA256.pdf`]([LUT-SHA256_EN.pdf)
 
 ## Installation and Usage
 
