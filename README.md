@@ -31,7 +31,7 @@ Documentos:
 ## Instalación y Uso
 
 ```bash
-git clone https://github.com/abraham-a/LUT-SHA256
+git clone https://github.com/UacProgrammer/LUT-SHA256
 cd LUT-SHA256
 python3 -m venv .venv && source .venv/bin/activate
 # sin dependencias externas; solo Python 3.10+
