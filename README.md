@@ -23,10 +23,8 @@
 | Compresión v2.0–v2.4 | Tablas fusionadas, triangular, TROT, cero-bloques | §8 |
 
 Documentos:
-- Paper académico (IEEE): [`../paper/paper_LUT-SHA256.pdf`](../paper/paper_LUT-SHA256.pdf)
+- Paper académico (IEEE): (../paper/paper_LUT-SHA256.pdf)
 - Informe técnico completo (v1.1): [`../paper/informe_LUT-SHA256.pdf`](../paper/informe_LUT-SHA256.pdf)
-- Metadatos Zenodo: [`../zenodo/zenodo_metadata.txt`](../zenodo/zenodo_metadata.txt)
-- Artículo divulgativo: [`../devto/articulo_devto.md`](../devto/articulo_devto.md)
 
 ## Instalación y Uso
 
