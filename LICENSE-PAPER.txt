@@ -1,0 +1,14 @@
+License
+
+Document & Technical Report
+This document (paper and technical report) is distributed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0) license.
+
+You are free to: copy and redistribute the material in any medium or format, provided that you:
+- Give appropriate credit to Abraham A.
+- Do not use the material for commercial purposes.
+- Do not distribute modified or derivative versions of the material.
+
+Full license text: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
+
+Source Code
+The Python source code is licensed under the MIT License, allowing free use, modification, and distribution, provided the original copyright notice is preserved.
