@@ -5,34 +5,35 @@
 [![Language](https://img.shields.io/badge/Python-3.10%2B-green.svg)](#)
 [![Version](https://img.shields.io/badge/version-2.4.0-orange.svg)](#)
 
-> **LUT-SHA256: Arithmetic-Free Execution of SHA-256 through Chained Look-Up Tables**
+> **LUT-SHA256: Arithmetic-Free Execution of SHA-256 through Chained Look-Up Tables**  
 > *Abraham A. — Independent Research*
 
 **Abstract.** LUT-SHA256 executes the SHA-256 compression function without ever applying an arithmetic, logical, or shift operation to message data: bytes act only as indices into precomputed tables. Addition modulo 2³² becomes a chained byte-carry table (TADDC); rotations become byte recombination (TROT). The method is *provably* equivalent to FIPS 180-4 and digest-identical in every tested scenario (FIPS vectors, BIP39 exercises, block boundaries, long messages, zero blocks).
 
-## Arquitectura y Teoremas Clave
+## Architecture and Key Theorems
 
-| Teorema | Idea | PDF |
+| Theorem / Feature | Concept | PDF Section |
 |---|---|---|
-| T1 | Descomposición funcional | §2.1 |
-| T2 | Byte-localidad de las primitivas | §2.1 |
-| T3 | Cadena de acarreos TADDC (inducción) | §2.1 |
-| T4 | Rotaciones por recombinación de bytes | §2.1 |
-| T5 | Equivalencia con SHA-256 | §2.1 |
-| Escalera V1.0–V1.7 | Análisis de canal lateral | §7 |
-| Compresión v2.0–v2.4 | Tablas fusionadas, triangular, TROT, cero-bloques | §8 |
+| T1 | Functional decomposition | §2.1 |
+| T2 | Byte-locality of primitives | §2.1 |
+| T3 | TADDC carry chain (induction) | §2.1 |
+| T4 | Rotations via byte recombination | §2.1 |
+| T5 | Equivalence with SHA-256 | §2.1 |
+| Vulnerability Ladder V1.0–V1.7 | Side-channel analysis | §7 |
+| Compression v2.0–v2.4 | Fused tables, triangular storage, TROT, zero-blocks | §8 |
 
-Documentos:
-- Paper académico (IEEE): ([../paper/paper_LUT-SHA256.pdf](https://zenodo.org/records/22140328))
-- Informe técnico completo (v1.1): [`../paper/informe_LUT-SHA256.pdf`](../paper/informe_LUT-SHA256.pdf)
+**Documents:**
+- Academic Paper (IEEE format): [paper_LUT-SHA256.pdf](https://zenodo.org/records/22140328)
+- Complete Technical Report (v1.1, Spanish): [`informe_LUT-SHA256.pdf`](../paper/informe_LUT-SHA256.pdf)
 
-## Instalación y Uso
+## Installation and Usage
+
 
 ```bash
 git clone https://github.com/UacProgrammer/LUT-SHA256
 cd LUT-SHA256
 python3 -m venv .venv && source .venv/bin/activate
-# sin dependencias externas; solo Python 3.10+
+No external dependencies; requires Python 3.10+
 ```
 
 ```python
@@ -48,37 +49,37 @@ Tests:
 
 ```bash
 python3 -m unittest discover tests
-# vectores FIPS, ejercicios BIP39, fronteras 55/56/57, mensajes largos,
-# bloques de ceros, 50 mensajes aleatorios y primitivas contra la aritmética
+# Includes: FIPS vectors, BIP39 exercises, 55/56/57 byte boundaries, 
+# long messages, zero blocks, 50 random messages, and primitive validation against arithmetic.
 ```
 
-## Limitaciones y Casos de Uso
+## Limitations and Use Cases
 
-**A favor (FPGAs, Secure Elements, CIM):** el circuito pasa de ~116k puertas booleanas a ~8–17k lecturas de memoria por bloque; ideal para sustratos ricos en SRAM y pobres en lógica, con tablas certificadas en ROM. El modo v2.3 (bloques de ceros maestros) ahorra ~2.000 búsquedas por bloque de relleno — relevante para PBKDF2/BIP39.
+**Advantages (FPGAs, Secure Elements, Compute-in-Memory)**: The circuit shifts from ~116k Boolean gates to ~8–17k memory reads per block. It is ideal for SRAM-rich, logic-poor substrates with certified tables in ROM. The v2.3 mode (master zero-blocks) saves ~2,000 lookups per padding block, which is highly relevant for PBKDF2/BIP39 workloads.
 
-**En contra (GPUs):** accesos no coalescentes dependientes del dato; el rendimiento por bloque colapsa frente a implementaciones vectorizadas. **No** es un acelerador de minería.
+**Disadvantages (GPUs)**: Data-dependent, non-coalesced memory accesses cause per-block throughput to collapse compared to vectorized arithmetic implementations. This is not a mining accelerator.
 
-**Seguridad:** la equivalencia (Teorema 5) preserva preimagen 2²⁵⁶ y colisión 2¹²⁸, pero el patrón de accesos es un canal lateral inherente (ver la escalera V1.0–V1.7 en el informe). No usar en producción sin acceso de tiempo constante.
+**Security**: Equivalence (Theorem 5) preserves 2²⁵⁶ preimage and 2¹²⁸ collision resistance. However, the memory access pattern is an inherent side-channel (see the V1.0–V1.7 ladder in the report). Do not use in production without constant-time access mitigations.
 
-## Apoyo
+## Support
 
-Si este proyecto te ha parecido interesante o te ha sido útil para tu investigación, puedes apoyar el trabajo independiente de criptografía aquí: Bitcoin (SegWit): `bc1qqgqyu462z3n6lduvahfuvpm0lp6rzpkxal92t9`
+If you found this project interesting or useful for your research, you can support independent cryptography research here: Bitcoin (SegWit): `bc1qqgqyu462z3n6lduvahfuvpm0lp6rzpkxal92t9`
 
-## Licencia
+## License
 
-- Código: **MIT** ([`LICENSE`](LICENSE))
-- Paper e informe: **CC BY-NC-ND 4.0** ([`../paper/LICENSE-PAPER.txt`](../paper/LICENSE-PAPER.txt))
+- Code: **MIT** ([`LICENSE`](LICENSE))
+- Technical Report: **CC BY-NC-ND 4.0** ([`../paper/LICENSE-PAPER.txt`](../paper/LICENSE-PAPER.txt))
 
 ---
 
-## Estructura de `lut_sha256.py`
+## Structure of `lut_sha256.py`
 
 ```python
-"""LUT-SHA256: SHA-256 por tablas de búsqueda encadenadas.
+"""LUT-SHA256: SHA-256 via chained look-up tables.
 
-Módulo dividido en DOS capas independientes:
-  1) Generación de tablas (una sola vez, con aritmética Python).
-  2) Motor de hash (solo búsquedas; PROHIBIDO operar sobre los datos).
+Module divided into TWO independent layers:
+  1) Table generation (one-time setup, Python arithmetic allowed).
+  2) Hash engine (lookups ONLY; operating on data is PROHIBITED).
 """
 from __future__ import annotations
 from dataclasses import dataclass
@@ -86,31 +87,31 @@ from typing import Final, List, Tuple
 
 @dataclass(frozen=True)
 class Tables:
-    """Conjunto inmutable de tablas precomputadas."""
+    """Immutable set of precomputed tables."""
     txor: Tuple[Tuple[int, ...], ...]     # triangular: t[a][b], b <= a
     tand: Tuple[Tuple[int, ...], ...]
-    taddc: Tuple[Tuple[Tuple[int, int], ...], ...]  # (s | c<<8) por (a,b)
-    tnad: Tuple[Tuple[int, ...], ...]     # (~a) & b  (no simétrico)
+    taddc: Tuple[Tuple[Tuple[int, int], ...], ...]  # (s | c<<8) per (a,b)
+    tnad: Tuple[Tuple[int, ...], ...]     # (~a) & b  (non-symmetric)
     trot: Tuple[Tuple[Tuple[int, ...], ...], ...]   # r=1..7
 
 def build_tables(mode: str = "memory") -> Tables:
-    """Construye las tablas (aritmética permitida SOLO aquí).
+    """Builds the tables (arithmetic allowed ONLY here).
 
     Args:
-        mode: 'memory' (v2.1) o 'speed' (v2.4 con TROT).
+        mode: 'memory' (v2.1) or 'speed' (v2.4 with TROT).
 
     Returns:
-        Tables: objeto inmutable listo para LUT_SHA256.
+        Tables: Immutable object ready for LUT_SHA256.
     """
     ...
 
 class LUT_SHA256:
-    """Motor de hash sin operadores sobre datos."""
+    """Hash engine with no operators applied to data."""
 
     def __init__(self, tables: Tables) -> None: ...
+    
     def digest(self, message: bytes) -> bytes:
-        """SHA-256(message) resuelto exclusivamente por búsquedas."""
-        ...
+        """SHA-256(message) resolved exclusively via table lookups."""
 ```
 
-**Reglas de estilo:** PEP 8; type hints en todas las firmas; docstrings estilo Google; los únicos operadores aritméticos del motor actúan sobre *índices de bucle y contadores*, nunca sobre los datos; separar `build_tables` (aritmética) del motor (búsquedas) para auditar cada capa por separado; tests unitarios por primitiva + suite de vectores oficiales.
+**Style Rules:** PEP 8; type hints on all signatures; Google-style docstrings; the only arithmetic operators in the engine act on loop indices and counters, never on the data; strict separation of build_tables (arithmetic) from the engine (lookups) to allow independent auditing of each layer; unit tests per primitive + official vector test suite.
